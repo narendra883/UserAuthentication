@@ -20,7 +20,7 @@ const Home = () => {
 
     const fetchActivities = async (userId) => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/users/activities/${userId}`);
+            const response = await axios.get(`https://userauthentication-production-77f9.up.railway.app/api/users/activities/${userId}`);
             setActivities((prevActivities) => ({
                 ...prevActivities,
                 [userId]: response.data, // Store activities for each user by ID
