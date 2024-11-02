@@ -11,7 +11,7 @@ const Logout = () => {
   const handleLogout = () => {
     localStorage.removeItem("email");
     localStorage.removeItem("username");
-    setUsername(""); // Reset username
+    setUsername(""); 
     setTimeout(() => navigate('/'), 1000);
   };
 

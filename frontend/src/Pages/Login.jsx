@@ -13,9 +13,11 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await axios.post("https://userauthentication-production-77f9.up.railway.app/api/users/login", { email, password });
+      const username = response.data.user.username;
       localStorage.setItem("email", email);
-      localStorage.setItem("username",response.data.username);
-      setUsername(response.data.username);
+      localStorage.setItem("username",username);
+      console.log(response.data);
+      setUsername(username);
       navigate("/");
     } catch (err) {
       console.error('Login failed', err);

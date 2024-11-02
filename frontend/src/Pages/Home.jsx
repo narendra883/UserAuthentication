@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const Home = () => {
     const [users, setUsers] = useState([]);
-    const [activities, setActivities] = useState({}); // Store activities for each user
+    const [activities, setActivities] = useState({}); 
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -23,7 +23,7 @@ const Home = () => {
             const response = await axios.get(`https://userauthentication-production-77f9.up.railway.app/api/users/activities/${userId}`);
             setActivities((prevActivities) => ({
                 ...prevActivities,
-                [userId]: response.data, // Store activities for each user by ID
+                [userId]: response.data, 
             }));
         } catch (error) {
             console.error("Error fetching activities:", error);
@@ -59,7 +59,7 @@ const Home = () => {
                                     >
                                         View Activities
                                     </button>
-                                    {/* Show activities if loaded */}
+                                    
                                     {activities[user._id] && (
                                         <ul className="mt-2 text-sm text-gray-600">
                                             {activities[user._id].map((activity, index) => (

@@ -10,8 +10,8 @@ require('dotenv').config();
 const app = express();
 
 const allowedOrigins = [
-    'https://user-dashboard-nine.vercel.app', // Production
-    'http://localhost:5173' // Development
+    'https://user-dashboard-nine.vercel.app', 
+    'http://localhost:5173' 
 ];
 
 app.use(cors({
