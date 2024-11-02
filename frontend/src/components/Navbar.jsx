@@ -11,7 +11,7 @@ const Navbar = () => {
     const email = localStorage.getItem("email")
     
     useEffect(() => {
-        axios.get("http://localhost:5000/api/users/userprofile", {
+        axios.get("https://userauthentication-production-77f9.up.railway.app/api/users/userprofile", {
             headers: {
                 'x-user-email': email 
             }

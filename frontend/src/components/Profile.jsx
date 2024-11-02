@@ -13,7 +13,7 @@ const Profile = () => {
 
     const fetchUserProfile = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/users/userprofile", {
+            const response = await axios.get("https://userauthentication-production-77f9.up.railway.app/api/users/userprofile", {
                 headers: {
                     'x-user-email': email 
                 }
