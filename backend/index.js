@@ -8,6 +8,7 @@ require('dotenv').config();
 
 
 const app = express();
+app.use(cors({ origin: 'https://user-dashboard-nine.vercel.app' }));
 app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(bodyParser.json());
 const port = process.env.PORT || 3000;
