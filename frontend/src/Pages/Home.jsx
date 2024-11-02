@@ -8,7 +8,7 @@ const Home = () => {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await axios.get("http://localhost:5000/api/users/getallusers"); 
+                const response = await axios.get("https://userauthentication-production-77f9.up.railway.app/api/users/getallusers"); 
                 setUsers(response.data);
             } catch (error) {
                 console.error("Error fetching users:", error);
