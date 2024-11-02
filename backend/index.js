@@ -8,7 +8,21 @@ require('dotenv').config();
 
 
 const app = express();
-app.use(cors({ origin: 'https://user-dashboard-nine.vercel.app' }));
+
+const allowedOrigins = [
+    'https://user-dashboard-nine.vercel.app', // Production
+    'http://localhost:5173' // Development
+];
+
+app.use(cors({
+    origin: (origin, callback) => {
+        if (allowedOrigins.includes(origin) || !origin) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    }
+}));
 
 app.use(bodyParser.json());
 const port = process.env.PORT || 3000;
