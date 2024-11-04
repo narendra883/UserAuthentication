@@ -7,13 +7,14 @@ export const UserProvider = ({ children }) => {
   const email = localStorage.getItem("email");
 
   
+  
   useEffect(() => {
     const storedUsername = localStorage.getItem("username");
     if (storedUsername) setUsername(storedUsername);
   }, []);
 
   return (
-    <UserContext.Provider value={{ username, setUsername, email }}>
+    <UserContext.Provider value={{ username, setUsername, email}}>
       {children}
     </UserContext.Provider>
   );

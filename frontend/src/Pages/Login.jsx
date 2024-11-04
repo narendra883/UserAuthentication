@@ -7,6 +7,8 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { setUsername } = useContext(UserContext);
+  
+  
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -16,8 +18,9 @@ const Login = () => {
       const username = response.data.user.username;
       localStorage.setItem("email", email);
       localStorage.setItem("username",username);
-      console.log(response.data);
+      
       setUsername(username);
+      
       navigate("/");
     } catch (err) {
       console.error('Login failed', err);

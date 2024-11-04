@@ -1,15 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import picture from "../picture2.jpg";
+import { UserContext } from '../context/UserContext';
 
 const Profile = () => {
-    const email = localStorage.getItem("email");
+    const { email } = useContext(UserContext);
     const [userData, setUserData] = useState({
         username: '',
         email: '',
         profilePic: ''
     });
     const [newProfilePic, setNewProfilePic] = useState('');
+    const [newUsername, setNewUsername] = useState('');
 
     const fetchUserProfile = async () => {
         try {
@@ -18,8 +20,8 @@ const Profile = () => {
                     'x-user-email': email 
                 }
             });
-            
-            setUserData(response.data);
+            setUserData(response.data.user); // Access 'user' directly from response data
+            setNewUsername(response.data.user.username); // Set initial username value
         } catch (error) {
             console.error("Error fetching user profile:", error);
         }
@@ -30,22 +32,23 @@ const Profile = () => {
     }, []);
 
     const handleProfilePicChange = (e) => setNewProfilePic(e.target.value);
+    const handleUsernameChange = (e) => setNewUsername(e.target.value);
 
     const handleProfileUpdate = async () => {
         try {
             await axios.put("https://userauthentication-production-77f9.up.railway.app/api/users/updateProfile", 
-                { profilePic: newProfilePic },
+                { profilePic: newProfilePic, username: newUsername },
                 {
                     headers: {
                         'x-user-email': email 
                     }
                 }
             );
-            setUserData(prevData => ({ ...prevData, profilePic: newProfilePic }));
+            setUserData(prevData => ({ ...prevData, profilePic: newProfilePic, username: newUsername }));
             setNewProfilePic('');
-            alert("Profile picture updated successfully!");
+            alert("Profile updated successfully!");
         } catch (error) {
-            console.error("Error updating profile picture:", error);
+            console.error("Error updating profile:", error);
         }
     };
 
@@ -63,6 +66,13 @@ const Profile = () => {
             </div>
             <input
                 type="text"
+                placeholder="Enter new username"
+                value={newUsername}
+                onChange={handleUsernameChange}
+                className="w-full p-2 border border-gray-300 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <input
+                type="text"
                 placeholder="Enter profile picture URL"
                 value={newProfilePic}
                 onChange={handleProfilePicChange}
@@ -72,7 +82,7 @@ const Profile = () => {
                 onClick={handleProfileUpdate} 
                 className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition-colors font-semibold"
             >
-                Upload Picture
+                Update Profile
             </button>
         </div>
     );

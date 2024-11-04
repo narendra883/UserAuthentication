@@ -86,8 +86,7 @@ router.get('/userprofile', authenticate, async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-        res.json({user
-        });
+        res.json({user});
     } catch (error) {
         res.status(500).json({ message: "Error fetching user profile", error });
     }
@@ -95,13 +94,22 @@ router.get('/userprofile', authenticate, async (req, res) => {
 
 // Profile update route
 router.put('/updateProfile', authenticate, async (req, res) => {
-    const { profilePic } = req.body;
+    const { profilePic, username } = req.body; // Destructure username and profilePic
 
     try {
-       
+        const updateFields = {};
+        let message = ""; // Initialize a message variable
+
+        if (profilePic) {
+            updateFields.profilePic = profilePic; // Update profilePic field
+        }
+        if (username) {
+            updateFields.username = username; // Update username field
+        }
+
         const updatedUser = await User.findOneAndUpdate(
             { email: req.user.email },
-            { profilePic },
+            { $set: updateFields },
             { new: true }
         );
 
@@ -109,16 +117,25 @@ router.put('/updateProfile', authenticate, async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
 
-        
-        await addNotification(updatedUser._id, "User updated profile picture");
+        // Log specific notifications based on which fields were updated
+        if (profilePic) {
+            message = "Profile picture updated successfully";
+            await addNotification(updatedUser._id, message);
+            await addActivity(updatedUser._id, message);
+            
+        }
+        if (username) {
+            message = "Username updated successfully";
+            await addNotification(updatedUser._id, message);
+            await addActivity(updatedUser._id, message);
+        }
 
-        await addActivity(updatedUser._id, "User updated profile picture");
-
-        res.json(updatedUser);
+        res.json({ message: "Profile updated successfully", user: updatedUser });
     } catch (error) {
         res.status(500).json({ message: "Error updating profile", error });
     }
 });
+
 
 
 router.get('/getuser',authenticate, async (req,res)=>{
