@@ -18,7 +18,6 @@ const userSchema = new mongoose.Schema({
     profilePicture: {
         type: String
     },
-    
     lastLogin: {
         type: Date
     },
@@ -29,6 +28,22 @@ const userSchema = new mongoose.Schema({
                 required: true
             },
             date: {
+                type: Date,
+                default: Date.now
+            }
+        }
+    ],
+    notifications: [ 
+        {
+            message: {
+                type: String,
+                required: true
+            },
+            isRead:{
+                type:Boolean,
+                default:false,
+            },
+            createdAt: {
                 type: Date,
                 default: Date.now
             }

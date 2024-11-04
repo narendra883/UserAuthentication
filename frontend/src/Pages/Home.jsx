@@ -1,38 +1,49 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from 'axios';
+import { UserContext, UserProvider } from "../context/UserContext";
 
 const Home = () => {
-    const [users, setUsers] = useState([]);
-    const [activities, setActivities] = useState({}); 
+    const [user, setUser] = useState(null); 
+    const [activities, setActivities] = useState([]);
+    const { username } = useContext(UserContext); 
+    const {email} = useContext(UserContext);
 
     useEffect(() => {
-        const fetchUsers = async () => {
+        const fetchUser = async () => {
             try {
-                const response = await axios.get("https://userauthentication-production-77f9.up.railway.app/api/users/getallusers"); 
-                setUsers(response.data);
+                
+                const response = await axios.get(`http://localhost:5000/api/users/getuser`,{
+                    headers: {
+                        'x-user-email': email 
+                    }
+                });
+                setUser(response.data);
             } catch (error) {
-                console.error("Error fetching users:", error);
+                console.error("Error fetching user data:", error);
             }
         };
 
-        fetchUsers();
-    }, []);
+        if (username) {
+            fetchUser();
+        }
+    }, [username]);
 
-    const fetchActivities = async (userId) => {
+    const fetchActivities = async () => {
         try {
-            const response = await axios.get(`https://userauthentication-production-77f9.up.railway.app/api/users/activities/${userId}`);
-            setActivities((prevActivities) => ({
-                ...prevActivities,
-                [userId]: response.data, 
-            }));
+            const response = await axios.get(`https://userauthentication-production-77f9.up.railway.app/api/users/activities/${user._id}`);
+            setActivities(response.data);
         } catch (error) {
             console.error("Error fetching activities:", error);
         }
     };
 
+    if (!user) {
+        return <div>Please login first</div>;
+    }
+
     return (
         <div className="max-w-4xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg border border-gray-200">
-            <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">User List</h1>
+            <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Welcome {username}</h1>
             <div className="overflow-x-auto">
                 <table className="min-w-full bg-white border border-gray-200">
                     <thead>
@@ -45,31 +56,28 @@ const Home = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {users.map(user => (
-                            <tr key={user._id} className="hover:bg-gray-50">
-                                <td className="py-2 px-4 border-b text-gray-700">{user.username}</td>
-                                <td className="py-2 px-4 border-b text-gray-700">{user.email}</td>
-                                <td className="py-2 px-4 border-b text-gray-600">{new Date(user.createdAt).toLocaleDateString()}</td>
-                                <td className="py-2 px-4 border-b text-gray-600">{new Date(user.lastLogin).toLocaleDateString()}</td>
-                                <td className="py-2 px-4 border-b text-gray-700">
-                                    {/* Button to load activities */}
-                                    <button 
-                                        onClick={() => fetchActivities(user._id)} 
-                                        className="text-blue-500 hover:underline"
-                                    >
-                                        View Activities
-                                    </button>
-                                    
-                                    {activities[user._id] && (
-                                        <ul className="mt-2 text-sm text-gray-600">
-                                            {activities[user._id].map((activity, index) => (
-                                                <li key={index}>{activity.message}</li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
+                        <tr className="hover:bg-gray-50">
+                            <td className="py-2 px-4 border-b text-gray-700">{user.username}</td>
+                            <td className="py-2 px-4 border-b text-gray-700">{user.email}</td>
+                            <td className="py-2 px-4 border-b text-gray-600">{new Date(user.createdAt).toLocaleDateString()}</td>
+                            <td className="py-2 px-4 border-b text-gray-600">{new Date(user.lastLogin).toLocaleDateString()}</td>
+                            <td className="py-2 px-4 border-b text-gray-700">
+                                <button 
+                                    onClick={fetchActivities} 
+                                    className="text-blue-500 hover:underline"
+                                >
+                                    View Activities
+                                </button>
+                                
+                                {activities.length > 0 && (
+                                    <ul className="mt-2 text-sm text-gray-600">
+                                        {activities.map((activity, index) => (
+                                            <li key={index}>{activity.message}</li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

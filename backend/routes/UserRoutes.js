@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
 const authenticate = require("../middleware/AuthMiddleware");
 const User = require("../model/User");
+
 const router = express.Router();
 
 
@@ -32,33 +33,50 @@ const addActivity = async(userId,message)=>{
     }
 }
 
+const addNotification = async(userId,message)=>{
+    try{
+        await User.findByIdAndUpdate(
+            userId,
+            {$push:{notifications:{message}}},
+            {new:true}
+        );
+    } catch(error){
+        console.log(error);
+    }
+}
+
 //Login
 
-router.post('/login',async(req,res)=>{
-    const {email,password} = req.body;
+// Login Route
+router.post('/login', async (req, res) => {
+    const { email, password } = req.body;
 
-    try{
-        const user = await User.findOne({email});
-        if(!user){
-            return res.status(404).json({message:"User Not Found    "});
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: "User Not Found" });
         }
-        const passwordMatch = await bcrypt.compare(password,user.password);
-        if(!passwordMatch){
-            return res.status(401).json({message:"please enter valid password"});
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch) {
+            return res.status(401).json({ message: "Please enter a valid password" });
         }
 
-        // update the last login
+        // Update the last login
         user.lastLogin = new Date();
+        
+
+        // Add a login notification and activity
+        await addNotification(User._id, "User logged in successfully");
+        await addActivity(user._id, "User logged in");
         await user.save();
 
-        // Log login activity
-        await addActivity(user._id,"User Logged in");
-        res.status(200).json({message:"User Login successful",user});
-
-    } catch(error){
-        res.status(500).json({message:"Error:",error});
+        
+        res.status(200).json({ message: "User login successful", user });
+    } catch (error) {
+        res.status(500).json({ message: "Error during login", error });
     }
 });
+
 
 
 // user profile route
@@ -68,13 +86,7 @@ router.get('/userprofile', authenticate, async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-        res.json({
-            username: user.username,
-            email: user.email,
-            profilePicture: user.profilePicture,
-            lastLogin: user.lastLogin,
-            theme: user.theme,
-            twoFactorEnabled: user.twoFactorEnabled
+        res.json({user
         });
     } catch (error) {
         res.status(500).json({ message: "Error fetching user profile", error });
@@ -86,7 +98,7 @@ router.put('/updateProfile', authenticate, async (req, res) => {
     const { profilePic } = req.body;
 
     try {
-        // Find and update the user’s profile picture
+       
         const updatedUser = await User.findOneAndUpdate(
             { email: req.user.email },
             { profilePic },
@@ -97,7 +109,9 @@ router.put('/updateProfile', authenticate, async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
 
-        // Add activity for profile update
+        
+        await addNotification(updatedUser._id, "User updated profile picture");
+
         await addActivity(updatedUser._id, "User updated profile picture");
 
         res.json(updatedUser);
@@ -107,9 +121,9 @@ router.put('/updateProfile', authenticate, async (req, res) => {
 });
 
 
-router.get('/getallusers', async (req,res)=>{
+router.get('/getuser',authenticate, async (req,res)=>{
     try{
-        const users = await User.find({});
+        const users = await User.findOne({email:req.user.email});
         res.status(200).json(users);
     } catch(error){
         res.status(500).json({message:"Error while fetching the users"});
@@ -131,6 +145,36 @@ router.get('/activities/:userId', async (req, res) => {
         res.status(500).json({ message: "Error fetching activities", error });
     }
 });
+
+
+// Route to get all notifications for a user
+router.get("/getnotifications", authenticate, async (req, res) => {
+    try {
+        const user = await User.findOne({ email: req.user.email });
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        res.json(user.notifications);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching notifications", error });
+    }
+});
+
+// route to return notification that not read
+router.patch('/markAsRead', async (req, res) => {
+    const { email, notificationId } = req.body;
+    try {
+        await User.updateOne(
+            { email, "notifications._id": notificationId },
+            { $set: { "notifications.$.isRead": true } }
+        );
+        res.status(200).json({ message: 'Notification marked as read' });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to mark as read' });
+    }
+});
+
+
+
 
 
 

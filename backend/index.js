@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const cors = require("cors");
 const userRoutes = require("./routes/UserRoutes");
 
+
 require('dotenv').config();
 
 
@@ -39,6 +40,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/users', userRoutes);
+
 
 
 
