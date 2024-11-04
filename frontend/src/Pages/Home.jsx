@@ -12,7 +12,7 @@ const Home = () => {
         const fetchUser = async () => {
             try {
                 
-                const response = await axios.get(`http://localhost:5000/api/users/getuser`,{
+                const response = await axios.get(`https://userauthentication-production-77f9.up.railway.app/api/users/getuser`,{
                     headers: {
                         'x-user-email': email 
                     }

@@ -33,7 +33,7 @@ const Profile = () => {
 
     const handleProfileUpdate = async () => {
         try {
-            await axios.put("http://localhost:5000/api/users/updateProfile", 
+            await axios.put("https://userauthentication-production-77f9.up.railway.app/api/users/updateProfile", 
                 { profilePic: newProfilePic },
                 {
                     headers: {
