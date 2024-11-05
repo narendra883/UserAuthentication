@@ -43,7 +43,7 @@ const Navbar = () => {
                     <div className="flex relative items-center">
                         <Link to="/notification" className="text-white font-semibold hover:text-purple-200 transition-colors relative">
                             <FaBell className="text-2xl" />
-                            {unreadCount > 0 && (
+                            {unreadCount>-1  && (
                                 <span className="absolute top-0 -right-2 transform -translate-x-1/2 -translate-y-1/2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">
                                     {unreadCount}
                                 </span>
@@ -54,7 +54,7 @@ const Navbar = () => {
                 )}
             </div>
             <button onClick={toggleTheme} className="text-white text-2xl focus:outline-none">
-                {darkMode ? <FaSun /> : <FaMoon />}
+                {darkMode ? <FaMoon />: <FaSun />}
             </button>
             {!!localStorage.getItem("email") && (
                 <div className="flex items-center">
